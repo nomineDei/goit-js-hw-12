@@ -16,7 +16,9 @@ loadMoreBtn.addEventListener("click", handleLoadMore);
 async function handleSubmit(event) {
     clearGallery();
     event.preventDefault();
+    showLoader();
     page = 1;
+
 
 
     const query = event.currentTarget.elements.searchText;
@@ -35,32 +37,39 @@ async function handleSubmit(event) {
         hideLoadMoreButton();
         return;
     }
+    try {
 
-    await getImagesByQuery(trimmedQuery, page, limit)
-        .then(result => {
+        const result = await getImagesByQuery(trimmedQuery, page, limit)
+        
             
-            if (result.hits.length === 0) {
-                throw new Error('No result');
-            }
-            createGallery(result.hits);
+        if (result.hits.length === 0) {
+            throw new Error('No result');
+        }
+        createGallery(result.hits);
 
-            totalPages = Math.ceil(result.totalHits / limit);
-            if (page < totalPages) {
-                showLoadMoreButton();
-            }
-        })
-        .catch(error => {
-            iziToast.error({
-                message: "Sorry, there are no images matching your search query. Please try again!",
+        totalPages = Math.ceil(result.totalHits / limit);
+        if (page < totalPages) {
+            showLoadMoreButton();
+        } else {
+            hideLoadMoreButton();
+            iziToast.info({
+                message: "That's all we found for your search.",
                 position: 'topRight',
                 timeout: 3000,
             });
-            hideLoadMoreButton();
-        })
-        .finally(() => {
-            query.value = '';
-    })
-    
+
+        }
+    } catch {
+        
+        iziToast.error({
+            message: "Sorry, there are no images matching your search query. Please try again!",
+            position: 'topRight',
+            timeout: 3000,
+        });
+        hideLoadMoreButton();
+    }
+    query.value = '';
+    hideLoader();
 }
 
 
@@ -104,7 +113,6 @@ async function handleLoadMore() {
 
     } finally {
         loadMoreBtn.disabled = false;
-        hideLoader();
-
     }
+     hideLoader();
 }
