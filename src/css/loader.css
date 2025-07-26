@@ -1,39 +1,28 @@
 .loader {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  display: block;
   margin: 0 auto;
-  width: 32px;
-  height: 32px;
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  border-radius: 50%;
-  color: #4e75ff;
-  animation: fill 1s ease-in infinite alternate;
-}
-.loader::before,
-.loader::after {
-  content: '';
-  position: absolute;
-  height: 100%;
-  width: 100%;
-  border-radius: 50%;
-  left: 48px;
-  top: 0;
-  animation: fill 0.9s ease-in infinite alternate;
+  position: relative;
+  background: #fff;
+  box-shadow: -24px 0 #fff, 24px 0 #fff;
+  box-sizing: border-box;
+  animation: shadowPulse 2s linear infinite;
 }
 
-.loader::after {
-  left: auto;
-  right: 48px;
-  animation-duration: 1.1s;
-}
-
-@keyframes fill {
-  0% {
-    box-shadow: 0 0 0 2px inset;
+@keyframes shadowPulse {
+  33% {
+    background: #fff;
+    box-shadow: -24px 0 #4e75ff, 24px 0 #fff;
+  }
+  66% {
+    background: #4e75ff;
+    box-shadow: -24px 0 #fff, 24px 0 #fff;
   }
   100% {
-    box-shadow: 0 0 0 10px inset;
+    background: #fff;
+    box-shadow: -24px 0 #fff, 24px 0 #4e75ff;
   }
 }
 

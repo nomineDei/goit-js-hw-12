@@ -1,22 +1,25 @@
 import axios from 'axios';
 
-const API_KEY = "51334256-c1710c37c982a8ca30afac428";
+const API_KEY = "51334256-c1710c37c982a8ca30afac428"; 
 
-export default function getImagesByQuery(query) {
+export default async function getImagesByQuery(query, page= 1, limit = 15) {
 
-   return axios(`https://pixabay.com/api/`, {
-        params:
-        { key: API_KEY,
-         q: query,
-         image_type: "photo",
-         orientation: "horizontal",
-         safesearch: true }
-    })
-        .then(res => {
-            return res.data.hits;
-        })
-        .catch(error => {
-            return [];
-    })
+        const { data } = await axios(`https://pixabay.com/api/`, {
+            params:
+            {
+                key: API_KEY,
+                q: query,
+                image_type: "photo",
+                orientation: "horizontal",
+                safesearch: true,
+                page: page,
+                per_page: limit
+            }
+        });
+    
+    
+        return data;
+    }
 
-}
+   
+
