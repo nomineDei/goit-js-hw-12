@@ -3,7 +3,7 @@ import SimpleLightbox from "simplelightbox";
 import "simplelightbox/dist/simple-lightbox.min.css";
 import "../css/gallery.css"
 
-export const loadMoreBtn = document.querySelector(".load-more-btn")
+const loadMoreBtn = document.querySelector(".load-more-btn")
 const gallery = document.querySelector(".gallery")
 let lightbox = new SimpleLightbox('.gallery a', {
     captions: true,
@@ -46,6 +46,10 @@ export function clearGallery() {
     });
 }
 
+export function onLoadMoreClick(callback) {
+    loadMoreBtn.addEventListener("click", callback);
+}
+
 export function showLoader() {
   document.querySelector('.loader').classList.remove('is-hidden');
 }
@@ -60,4 +64,12 @@ export function showLoadMoreButton() {
 
 export function hideLoadMoreButton() {
   loadMoreBtn.classList.add('is-hidden');
+}
+
+export function disableLoadMoreButton() {
+    loadMoreBtn.disabled = true;
+}
+
+export function enableLoadMoreButton() {
+    loadMoreBtn.disabled = false;
 }

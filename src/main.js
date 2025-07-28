@@ -1,22 +1,23 @@
 import getImagesByQuery from "./js/pixabay-api";
-import { createGallery, clearGallery, showLoader, hideLoader, showLoadMoreButton, hideLoadMoreButton, loadMoreBtn } from "./js/render-functions";
+import { createGallery, clearGallery, showLoader, hideLoader, showLoadMoreButton, hideLoadMoreButton, disableLoadMoreButton, enableLoadMoreButton, onLoadMoreClick } from "./js/render-functions";
 import iziToast from "izitoast";
 import "izitoast/dist/css/iziToast.min.css";
 
 
 const form = document.querySelector(".form");
+const IMAGES_PER_PAGE = 15;
 let page = 1;
-let limit = 15;
 let totalPages = 0;
 let searchQuery = "";
 
 form.addEventListener("submit", handleSubmit);
-loadMoreBtn.addEventListener("click", handleLoadMore);
+onLoadMoreClick(handleLoadMore);
 
 async function handleSubmit(event) {
-    clearGallery();
     event.preventDefault();
-    showLoader();
+    clearGallery();
+    hideLoadMoreButton();
+   
     page = 1;
 
 
@@ -32,22 +33,27 @@ async function handleSubmit(event) {
             position: "topRight",
             timeout: 3000,
         });
-        query.value = '';
-        hideLoader();
-        hideLoadMoreButton();
         return;
     }
+    showLoader();
     try {
-
-        const result = await getImagesByQuery(trimmedQuery, page, limit)
+        const result = await getImagesByQuery(trimmedQuery, { page, limit: IMAGES_PER_PAGE })
         
             
         if (result.hits.length === 0) {
-            throw new Error('No result');
+           iziToast.error({
+            message: "No images found!",
+            position: 'topRight',
+            timeout: 3000,
+           });
+            hideLoader();
+            return;
+            
         }
-        createGallery(result.hits);
+        
 
-        totalPages = Math.ceil(result.totalHits / limit);
+        totalPages = Math.ceil(result.totalHits / IMAGES_PER_PAGE);
+        createGallery(result.hits);
         if (page < totalPages) {
             showLoadMoreButton();
         } else {
@@ -59,28 +65,31 @@ async function handleSubmit(event) {
             });
 
         }
+        query.value = '';
     } catch {
-        
         iziToast.error({
             message: "Sorry, there are no images matching your search query. Please try again!",
             position: 'topRight',
             timeout: 3000,
         });
         hideLoadMoreButton();
+    } finally {
+         hideLoader();
+
     }
-    query.value = '';
-    hideLoader();
+    
+   
 }
 
 
 async function handleLoadMore() {
     page++;
-    loadMoreBtn.disabled = true;
+    disableLoadMoreButton();
     showLoader();
 
 
     try { 
-        const data = await getImagesByQuery(searchQuery, page, limit);
+        const data = await getImagesByQuery(searchQuery, { page, limit: IMAGES_PER_PAGE });
         createGallery(data.hits);
         
         setTimeout(() => {
@@ -112,7 +121,8 @@ async function handleLoadMore() {
             });
 
     } finally {
-        loadMoreBtn.disabled = false;
+        enableLoadMoreButton();
+        hideLoader();
     }
-     hideLoader();
+     
 }
